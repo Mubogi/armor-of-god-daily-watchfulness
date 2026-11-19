@@ -13,14 +13,81 @@ Built with plain HTML, CSS, and vanilla JavaScript on HTML5 Canvas. No framework
 
 ## Play it now
 
-Open `index.html` in a browser, or serve the folder:
+Four ways to play, all from the same source.
+
+### 1. Browser (recommended, zero setup)
+
+**<https://mubogi.github.io/armor-of-god-daily-watchfulness/>**
+
+Or serve the folder yourself:
 
 ```bash
 python3 -m http.server 8000
 # then visit http://localhost:8000
 ```
 
-A local server is recommended (ES modules and `localStorage` behave best over `http://`).
+A local server is required for the multi-file version, because ES modules and `localStorage`
+behave best over `http://`. The single-file build below removes that requirement.
+
+### 2. Single file — no server, no install
+
+Download **`ArmorOfGod-web-single-file.html`** from the
+[latest release](https://github.com/Mubogi/armor-of-god-daily-watchfulness/releases/latest)
+and double-click it. Everything — HTML, CSS, JavaScript, fonts, icons — is inlined into one
+157 KB file. It runs offline straight from disk, and it works on a USB stick.
+
+### 3. Android APK
+
+Download **`armor-of-god-1.1.0.apk`** from the release, then open it on your phone
+(you will need to allow installs from your browser or file manager once).
+
+- Android 5.0 (API 21) and newer, any screen size
+- **No permissions at all** — no internet, no storage, no ads, no tracking
+- Fully offline: the app blocks network loads at the WebView level
+- Progress is stored on the device and survives restarts
+
+### 4. Desktop — Windows and Linux
+
+Download **`ArmorOfGod-windows-x64.zip`** or **`ArmorOfGod-linux-x64.zip`**, unpack it,
+and run `ArmorOfGod.exe` (Windows) or `ArmorOfGod` (Linux).
+
+- Portable: no installer, no registry writes, no admin rights
+- Fully offline, sandboxed renderer, no Node.js access from the page
+- Runs on Windows 10/11 and mainstream 64-bit Linux desktops
+
+Each release publishes `SHA256SUMS.txt` so you can verify your download:
+
+```bash
+sha256sum -c SHA256SUMS.txt
+```
+
+---
+
+## Building from source
+
+```bash
+npm install                 # esbuild, electron, electron-packager
+npm run build               # -> dist/armor-of-god.html (single file)
+npm run build:desktop       # -> dist/desktop/{win32,linux}-x64/
+npm run build:apk           # -> dist/armor-of-god-<version>.apk
+npm run build:all           # all of the above
+```
+
+The APK build needs a JDK and the Android SDK (build-tools + platform). It uses
+`aapt2`, `d8`, `zipalign`, and `apksigner` directly, with no Gradle and no network access.
+See `tools/build-apk.sh` for the exact steps.
+
+### Tests
+
+```bash
+npm test                    # 31 browser checks: full weeks, persistence, layout
+npm run test:desktop        # 22 checks against the packaged Electron app
+```
+
+The browser suite plays complete seven-day weeks in all three difficulty modes, exercises
+save/load, and asserts there is no horizontal overflow at five viewport sizes. The desktop
+suite drives the real packaged binary and checks that pause, backgrounding, and hardware-back
+interruptions never strand a live encounter.
 
 ---
 

@@ -13,8 +13,16 @@ function safeParse(raw) {
   }
 }
 
+function safeGet(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
 export function loadSave() {
-  const data = safeParse(localStorage.getItem(KEY));
+  const data = safeParse(safeGet(KEY));
   if (!data || data.version !== VERSION) return null;
   return data;
 }
@@ -42,7 +50,7 @@ export function hasSave() {
 
 /** Cross-run meta progression: unlocked verses, seen cards, lifetime stats. */
 export function loadMeta() {
-  const data = safeParse(localStorage.getItem(META_KEY));
+  const data = safeParse(safeGet(META_KEY));
   return {
     unlockedVerses: [],
     runsCompleted: 0,

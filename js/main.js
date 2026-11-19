@@ -533,9 +533,35 @@ class Game {
     });
   }
 
+  /**
+   * Hosts (Android/desktop shells, PWA) call this when the app is backgrounded.
+   * Freezes the response timer and shows the pause menu so a timed encounter
+   * cannot be lost while the player is away.
+   */
+  onAppHidden() {
+    if (this.screen !== 'battle' || this.busy || this.paused) return;
+    if (this.windowLeft <= 0) return;
+    this.hiddenWhileRunning = true;
+    this.openPause();
+  }
+
+  /** Restores timer state after the app becomes visible again. */
+  onAppVisible() {
+    if (this.hiddenWhileRunning) {
+      this.hiddenWhileRunning = false;
+    }
+  }
+
   openPause() {
-    if (this.paused) return;
+    // Never interrupt a result screen: it owns the only path forward, so
+    // replacing it would strand the player mid-battle.
+    if (this.paused || this.busy) return;
     this.paused = true;
+    // Pause replaces whatever modal is open, so a live encounter must be
+    // remembered and rebuilt on resume; otherwise the threat is lost and the
+    // battle can never continue.
+    this.pausedEncounter =
+      this.currentEncounter && !this.busy && this.windowLeft > 0 ? this.currentEncounter : null;
     this.modals.pause({
       state: this.state || createState(this.selectedMode),
       meta: this.meta,
@@ -574,7 +600,19 @@ class Game {
     const prevClose = this.modals.onClose;
     this.modals.onClose = () => {
       this.paused = false;
+      const pending = this.pausedEncounter;
+      this.pausedEncounter = null;
       if (prevClose) prevClose();
+      // Reopen the interrupted threat so the battle resumes where it stopped.
+      if (pending && pending === this.currentEncounter && this.screen === 'battle' && !this.busy) {
+        this.modals.encounter({
+          encounter: pending,
+          state: this.state,
+          onChoose: (opt) => this.choose(opt),
+          onIntercede: () => this.intercedeDuringBattle()
+        });
+        this.paintTimer();
+      }
     };
   }
 
@@ -664,7 +702,7 @@ class Game {
   /* ---------- per-frame ---------- */
 
   tick(dt) {
-    if (this.screen !== 'battle' || !this.currentEncounter || this.busy) return;
+    if (this.screen !== 'battle' || !this.currentEncounter || this.busy || this.paused) return;
     if (this.windowLeft <= 0) return;
     this.windowLeft = Math.max(0, this.windowLeft - dt);
     this.paintTimer();
@@ -691,5 +729,11 @@ class Game {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  window.__game = new Game();
+  const game = new Game();
+  window.__game = game;
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) game.onAppHidden();
+    else game.onAppVisible();
+  });
 });
