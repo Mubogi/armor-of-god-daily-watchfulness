@@ -2,3 +2,15 @@
 node_modules/
 *.log
 .agent_tmp/
+
+# Build output: release artifacts are attached to GitHub Releases, not committed.
+dist/
+
+# Signing material must never enter version control.
+android/keystore/
+*.jks
+*.keystore
+
+# Python
+__pycache__/
+*.pyc

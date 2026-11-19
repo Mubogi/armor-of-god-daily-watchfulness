@@ -1,0 +1,31 @@
+{
+  "name": "armor-of-god-daily-watchfulness",
+  "version": "1.1.0",
+  "description": "A 2D tactical readiness and daily spiritual battle game grounded in Ephesians 6:10-18.",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:apk": "bash tools/build-apk.sh",
+    "build:desktop": "node build.mjs && node build-desktop.mjs",
+    "build:all": "node build.mjs && node build-desktop.mjs && bash tools/build-apk.sh",
+    "icons": "python3 tools/make_icons.py",
+    "test": "python3 tests/web-e2e.py && python3 tests/lifecycle-e2e.py",
+    "test:desktop": "xvfb-run -a electron --no-sandbox --disable-gpu tests/desktop-e2e.cjs",
+    "serve": "python3 -m http.server 8000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mubogi/armor-of-god-daily-watchfulness.git"
+  },
+  "keywords": [],
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Mubogi/armor-of-god-daily-watchfulness/issues"
+  },
+  "homepage": "https://github.com/Mubogi/armor-of-god-daily-watchfulness#readme",
+  "devDependencies": {
+    "@electron/packager": "^18.4.2",
+    "electron": "^33.4.11",
+    "esbuild": "^0.25.10"
+  },
+  "private": true
+}

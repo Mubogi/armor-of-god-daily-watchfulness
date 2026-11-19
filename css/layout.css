@@ -96,7 +96,12 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding: var(--sp-5);
+  padding-top: calc(var(--sp-5) + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
+  padding-left: calc(var(--sp-5) + env(safe-area-inset-left, 0px));
+  padding-right: calc(var(--sp-5) + env(safe-area-inset-right, 0px));
   scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
 }
 
 .screen--centered {
